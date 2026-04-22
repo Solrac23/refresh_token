@@ -1,0 +1,38 @@
+{
+  "name": "refreshToken",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.ts",
+  "type": "module",
+  "scripts": {
+    "studio:dev": "dotenv -e .env.development -- prisma studio",
+    "generate:dev": "dotenv -e .env.development -- prisma generate",
+    "migrate:dev": "dotenv -e .env.development -- prisma migrate dev --name",
+    "dev": "dotenv -e .env.development -- tsx watch src/app.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "packageManager": "pnpm@10.33.0",
+  "devDependencies": {
+    "@biomejs/biome": "2.4.9",
+    "@types/node": "^25.6.0",
+    "@types/pg": "^8.20.0",
+    "dotenv-cli": "^11.0.0",
+    "prisma": "^7.7.0",
+    "tsx": "^4.21.0",
+    "typescript": "^6.0.2"
+  },
+  "dependencies": {
+    "@fastify/cors": "^11.2.0",
+    "@fastify/jwt": "^10.0.0",
+    "@prisma/adapter-pg": "^7.7.0",
+    "@prisma/client": "^7.7.0",
+    "dayjs": "^1.11.20",
+    "dotenv": "^17.4.2",
+    "fastify": "^5.8.4",
+    "fastify-plugin": "^5.1.0",
+    "pg": "^8.20.0"
+  }
+}

@@ -1,0 +1,29 @@
+services:
+  pg:
+    image: postgres:18-alpine
+    container_name: "pg-refresh-token"
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - pg_network
+    ports:
+      - ${DATABASE_PORT}:5432
+    environment:
+      - TZ=America/Sao_Paulo
+      - PGTZ=America/Sao_Paulo
+      - POSTGRES_USER=${DATABASE_USER}
+      - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
+      - POSTGRES_DB=${DATABASE_NAME}
+    volumes:
+      - pg_data:/var/lib/postgresql/18/docker
+
+networks:
+  pg_network:
+    driver: bridge
+
+volumes:
+  pg_data:

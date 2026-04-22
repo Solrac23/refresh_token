@@ -1,0 +1,15 @@
+# Keep all dependencies out of version control
+node_modules
+/src/database/generated/prisma
+prisma/migrations
+
+# Keep environment variables out of version control
+.env.development
+.env.production
+.env.test
+
+# Keep vscode settings out of version control
+.vscode
+
+# Keep pnpm lock file out of version control
+pnpm-lock.yaml
