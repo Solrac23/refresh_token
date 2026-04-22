@@ -13,3 +13,6 @@ prisma/migrations
 
 # Keep pnpm lock file out of version control
 pnpm-lock.yaml
+
+# Keep makefile out of version control
+Makefile
