@@ -1,14 +1,18 @@
+dev := ''
+prod := ''
+test := ''
+
 docker-compose-dev:
-	docker compose -f docker-compose.yaml up -d
+	docker compose --env-file $(dev) -f docker-compose.yaml up -d
 
 
 docker-compose-prod:
-	docker compose -f docker-compose.yaml up -d
+	docker compose --env-file $(prod) -f docker-compose.yaml up -d
 
 
 docker-compose-test:
-	docker compose -f docker-compose.yaml up -d
+	docker compose --env-file $(test) -f docker-compose.yaml up -d
 
 
 docker-compose-down:
-	docker compose -f docker-compose.yaml down --rmi "local"
+	docker compose --env-file $(dev) -f docker-compose.yaml down --rmi "local"
