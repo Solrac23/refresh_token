@@ -1,6 +1,6 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
-import type { AuthenticateUserUseCase } from "./authenticate-user-use-case";
 import type { IAuthenticateUserRequestDTO } from "./authenticate-user-dto";
+import type { AuthenticateUserUseCase } from "./authenticate-user-use-case";
 
 export class AuthenticateUserController {
 	constructor(private authenticateUserUseCase: AuthenticateUserUseCase) {}
@@ -18,7 +18,9 @@ export class AuthenticateUserController {
 
 			return reply.status(201).send(token);
 		} catch (err: unknown) {
-			console.log(err);
+			if (err instanceof Error) {
+				return reply.status(401).send({ error: err.message });
+			}
 		}
 	}
 }

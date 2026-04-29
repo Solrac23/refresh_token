@@ -1,11 +1,11 @@
 import { prisma } from "@/database/lib/prisma";
+import type { GenerateRefreshTokenProvider } from "@/provider/generate-refresh-token-provider";
+import type { JwtProvider } from "@/provider/jwt/jwt-provider";
+import type { Encryption } from "../util/encryption";
 import type {
 	IAuthenticateUserRequestDTO,
 	IAuthenticateUserResponseDTO,
 } from "./authenticate-user-dto";
-import type { Encryption } from "../util/encryption";
-import type { GenerateRefreshTokenProvider } from "@/provider/generate-refresh-token-provider";
-import type { JwtProvider } from "@/provider/jwt/jwt-provider";
 
 export class AuthenticateUserUseCase {
 	constructor(
@@ -22,7 +22,7 @@ export class AuthenticateUserUseCase {
 		IAuthenticateUserResponseDTO | unknown
 	> {
 		try {
-			const user = await prisma.user.findFirst({
+			const user = await prisma.user.findFirstOrThrow({
 				where: {
 					OR: [{ username }, { email }],
 				},
@@ -56,8 +56,11 @@ export class AuthenticateUserUseCase {
 			const refreshToken = await this.generateRefreshToken.execute(user.id);
 
 			return { token, refreshToken };
-		} catch (err) {
-			console.log(err);
+		} catch (err: unknown) {
+			if (err instanceof Error) {
+				throw new Error(err.message);
+			}
+			throw err;
 		}
 	}
 }
