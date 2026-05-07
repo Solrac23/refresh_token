@@ -3,6 +3,8 @@ import dayjs from "dayjs";
 
 export class GenerateRefreshTokenProvider {
 	public async execute(userId: string) {
+		if (!userId) throw new Error("Credenciais invalidas");
+
 		const expiresIn = dayjs().add(15, "second").unix();
 
 		const generateToken = await prisma.refreshToken.create({

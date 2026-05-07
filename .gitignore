@@ -10,6 +10,7 @@ prisma/migrations
 
 # Keep vscode settings out of version control
 .vscode
+.zed
 
 # Keep pnpm lock file out of version control
 pnpm-lock.yaml

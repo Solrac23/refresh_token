@@ -1,6 +1,6 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
-import type { CreateUserUseCase } from "./create-user-use-case";
 import type { IUserRequestDTO } from "./create-user-dto";
+import type { CreateUserUseCase } from "./create-user-use-case";
 
 export class CreateUserController {
 	constructor(private createUserUseCase: CreateUserUseCase) {}
@@ -17,8 +17,10 @@ export class CreateUserController {
 			});
 
 			return reply.code(201).send(result);
-		} catch (error) {
-			return reply.code(400).send(error);
+		} catch (err: unknown) {
+			if (err instanceof Error) {
+				return reply.code(400).send({ error: err.message });
+			}
 		}
 	}
 }

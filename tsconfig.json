@@ -17,7 +17,7 @@
     "strict": true,
     "paths": {
       "@/*": ["./src/*"],
-      "@useCases/*": ["./src/useCases/*"],
+      "@useCases/*": ["./src/use-cases/*"],
       "@database/*": ["./src/database/*"],
       "@provider/*": ["./src/provider/*"]
     },

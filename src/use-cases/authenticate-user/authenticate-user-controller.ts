@@ -16,11 +16,12 @@ export class AuthenticateUserController {
 				password,
 			});
 
-			return reply.status(201).send(token);
+			return reply.code(201).send(token);
 		} catch (err: unknown) {
 			if (err instanceof Error) {
-				return reply.status(401).send({ error: err.message });
+				return reply.code(401).send({ error: err.message });
 			}
+			return reply.code(400).send({ error: err });
 		}
 	}
 }
