@@ -16,7 +16,7 @@ export class AuthenticateUserController {
 				password,
 			});
 
-			return reply.code(201).send(token);
+			return reply.code(200).send(token);
 		} catch (err: unknown) {
 			if (err instanceof Error) {
 				return reply.code(401).send({ error: err.message });
