@@ -19,7 +19,8 @@
       "@/*": ["./src/*"],
       "@useCases/*": ["./src/use-cases/*"],
       "@database/*": ["./src/database/*"],
-      "@provider/*": ["./src/provider/*"]
+      "@provider/*": ["./src/provider/*"],
+      "@schemas/*": ["./src/schemas/*"]
     },
     "esModuleInterop": true,
     "skipLibCheck": true,
