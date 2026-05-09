@@ -1,4 +1,4 @@
-import type { FastifyRequest, FastifyReply } from "fastify";
+import type { FastifyReply, FastifyRequest } from "fastify";
 
 export async function authenticate(
 	request: FastifyRequest,
@@ -7,6 +7,6 @@ export async function authenticate(
 	try {
 		await request.jwtVerify();
 	} catch (err: unknown) {
-		reply.status(401).send({ message: (err as Error).message });
+		return reply.status(401).send({ error: (err as Error).message });
 	}
 }
