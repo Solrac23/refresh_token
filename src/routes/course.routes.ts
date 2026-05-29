@@ -1,5 +1,5 @@
 import type { FastifyTypedInstance } from "@/fastify-typed-instance";
-import { authenticate } from "@/meddlewares/authenticate";
+import { authenticate } from "@/middlewares/authenticate";
 import { errorResponseSchema } from "@/schemas/error.schema";
 import { courseResponseSchema } from "@schemas/course.schema";
 
