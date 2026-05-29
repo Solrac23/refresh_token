@@ -9,39 +9,39 @@ export async function authRoutes(app: FastifyTypedInstance) {
 	const authController = authenticateUser(app);
 	const refreshTokenUserController = refreshTokenController(app);
 
-	app.post(
-		"/login",
-		{
-			schema: {
-				tags: ["login"],
-				description: "Login",
-				body: authRequestSchema,
-				response: {
-					200: authResponseSchema,
-					401: errorResponseSchema,
-				},
-			},
-		},
-		async (request, reply) => {
-			return await authController.handle(request, reply);
-		}
-	);
+  app.post(
+    "/login",
+    {
+      schema: {
+        tags: ["auth"],
+        description: "Login",
+        body: authRequestSchema,
+        response: {
+          200: authResponseSchema,
+          401: errorResponseSchema,
+        },
+      },
+    },
+    async (request, reply) => {
+      return await authController.handle(request, reply);
+    },
+  );
 
-	app.post(
-		"/refresh-token",
-		{
-			schema: {
-				tags: ["refresh-token"],
-				description: "Refresh token",
-				body: refreshTokenRequestSchema,
-				response: {
-					200: authResponseSchema,
-					400: errorResponseSchema,
-				},
-			},
-		},
-		async (request, reply) => {
-			return await refreshTokenUserController.handle(request, reply);
-		}
-	);
+  app.post(
+    "/refresh-token",
+    {
+      schema: {
+        tags: ["auth"],
+        description: "Refresh token",
+        body: refreshTokenRequestSchema,
+        response: {
+          200: authResponseSchema,
+          400: errorResponseSchema,
+        },
+      },
+    },
+    async (request, reply) => {
+      return await refreshTokenUserController.handle(request, reply);
+    },
+  );
 }
