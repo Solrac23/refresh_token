@@ -4,15 +4,18 @@ import { authenticate } from "@/middlewares/authenticate";
 import { searchUserController } from "@/use-cases/search-user";
 import { errorResponseSchema } from "@schemas/error.schema";
 import {
+  createUserACLRequestSchema,
+  createUserACLResponseSchema,
   createUserRequestSchema,
   createUserResponseSchema,
   searchUserResponseSchema,
 } from "@schemas/user.schema";
 import { createUserController } from "@useCases/create-user";
+import { createUserACLController } from "@/use-cases/create-user-acess-control-list";
 
 export async function userRoutes(app: FastifyTypedInstance) {
   app.post(
-    "/users",
+    "",
     {
       schema: {
         tags: ["users"],
@@ -29,8 +32,28 @@ export async function userRoutes(app: FastifyTypedInstance) {
     },
   );
 
+  app.post(
+    "/acl",
+    {
+      onRequest: authenticate,
+      schema: {
+        tags: ["users"],
+        description: "Create a user ACL",
+        body: createUserACLRequestSchema,
+        response: {
+          201: createUserACLResponseSchema,
+          400: errorResponseSchema,
+          401: errorResponseSchema,
+        },
+      },
+    },
+    async (request, reply) => {
+      return await createUserACLController.handle(request, reply);
+    },
+  );
+
   app.get(
-    "/users/:id",
+    "/:id",
     {
       onRequest: authenticate,
       schema: {
