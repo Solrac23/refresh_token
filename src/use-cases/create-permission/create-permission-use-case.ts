@@ -8,13 +8,13 @@ export class CreatePermissionUseCase {
     name,
     description,
   }: CreatePermissionDTO): Promise<CreatePermissionDTO> {
-    const permissionAlreadyExists = await prisma.permission.findFirst({
+    const permissionAlreadyExists = await prisma.permissions.findFirst({
       where: { name },
     });
 
     if (permissionAlreadyExists) throw new Error("Permission already exists");
 
-    const permission = await prisma.permission.create({
+    const permission = await prisma.permissions.create({
       data: { name, description },
       select: { id: true, name: true, description: true },
     });
