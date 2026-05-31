@@ -6,49 +6,49 @@ import type { IUserRepository } from "@/repositories/user-repository/i-user-repo
 import dayjs from "dayjs";
 
 export class RefreshTokenUserUseCase {
-	constructor(
-		private readonly jwtProvider: JwtProvider,
-		private readonly generateRefreshToken: GenerateRefreshTokenProvider,
-		private readonly userRepository: IUserRepository,
-		private readonly refreshTokenRepository: IRefreshTokenRepository
-	) {}
+  constructor(
+    private readonly jwtProvider: JwtProvider,
+    private readonly generateRefreshToken: GenerateRefreshTokenProvider,
+    private readonly userRepository: IUserRepository,
+    private readonly refreshTokenRepository: IRefreshTokenRepository,
+  ) {}
 
-	public async execute(refresh_token: string) {
-		const refreshTokenExist =
-			await this.refreshTokenRepository.findRefreshTokenById(refresh_token);
+  public async execute(refresh_token: string) {
+    const refreshTokenExist =
+      await this.refreshTokenRepository.findRefreshTokenById(refresh_token);
 
-		if (!refreshTokenExist) throw new Error("Refresh token not found");
+    if (!refreshTokenExist) throw new Error("Refresh token not found");
 
-		const user = await this.userRepository.findUserById(
-			refreshTokenExist.userId
-		);
+    const user = await this.userRepository.findUserById(
+      refreshTokenExist.userId,
+    );
 
-		if (!user) throw new Error("Refresh token not found");
+    if (!user) throw new Error("Refresh token not found");
 
-		const token = await this.jwtProvider.signToken({
-			id: refreshTokenExist.id,
-			username: user.username,
-			email: user.email,
-		});
+    const token = await this.jwtProvider.signToken({
+      id: refreshTokenExist.userId,
+      username: user.username,
+      email: user.email,
+    });
 
-		const refreshTokenExpired = dayjs().isAfter(
-			dayjs.unix(refreshTokenExist?.expiresIn)
-		);
+    const refreshTokenExpired = dayjs().isAfter(
+      dayjs.unix(refreshTokenExist?.expiresIn),
+    );
 
-		if (refreshTokenExpired) {
-			await prisma.refreshToken.deleteMany({
-				where: {
-					userId: refreshTokenExist.userId,
-				},
-			});
+    if (refreshTokenExpired) {
+      await prisma.refreshToken.deleteMany({
+        where: {
+          userId: refreshTokenExist.userId,
+        },
+      });
 
-			const newRefreshToken = await this.generateRefreshToken.execute(
-				refreshTokenExist.userId
-			);
+      const newRefreshToken = await this.generateRefreshToken.execute(
+        refreshTokenExist.userId,
+      );
 
-			return { token, refreshToken: newRefreshToken };
-		}
+      return { token, refreshToken: newRefreshToken };
+    }
 
-		return { token };
-	}
+    return { token };
+  }
 }
