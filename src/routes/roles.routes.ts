@@ -2,10 +2,13 @@ import type { FastifyTypedInstance } from "@/fastify-typed-instance";
 import { authenticate } from "@/middlewares/authenticate";
 import { errorResponseSchema } from "@/schemas/error.schema";
 import {
+  createRolePermissionRequestSchema,
+  createRolePermissionResponseSchema,
   createRoleRequestSchema,
   createRoleResponseSchema,
 } from "@/schemas/roles.schema";
 import { createRoleController } from "@/use-cases/create-role";
+import { createRolePermissionController } from "@/use-cases/create-role-permission";
 
 export async function rolesRoutes(app: FastifyTypedInstance) {
   app.post(
@@ -24,6 +27,24 @@ export async function rolesRoutes(app: FastifyTypedInstance) {
     },
     async (request, reply) => {
       return await createRoleController.handle(request, reply);
+    },
+  );
+
+  app.post(
+    "/:roleId/permissions",
+    {
+      schema: {
+        tags: ["roles"],
+        description: "Create role permissions",
+        body: createRolePermissionRequestSchema,
+        response: {
+          201: createRolePermissionResponseSchema,
+          400: errorResponseSchema,
+        },
+      },
+    },
+    async (request, reply) => {
+      return await createRolePermissionController.handle(request, reply);
     },
   );
 }
