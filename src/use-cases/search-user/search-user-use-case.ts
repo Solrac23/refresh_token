@@ -1,26 +1,16 @@
-import { prisma } from "@/database/lib/prisma";
+import type { IUserRepository } from "@/repositories/user-repository/i-user-repository";
 import type { SearchUserDTO } from "./search-user-dto";
 
 export class SearchUserUseCase {
-  public async execute(id: string): Promise<SearchUserDTO> {
-    const user = await prisma.user.findFirst({
-      where: {
-        id,
-      },
-      select: {
-        id: true,
-        name: true,
-        username: true,
-        email: true,
-        createdAt: true,
-        updatedAt: true,
-      },
-    });
+	constructor(private userRepository: IUserRepository) {}
 
-    if (!user || user === null) {
-      throw new Error("User not found");
-    }
+	public async execute(id: string): Promise<SearchUserDTO> {
+		const user = await this.userRepository.findByIdWithoutRelations(id);
 
-    return user;
-  }
+		if (!user || user === null) {
+			throw new Error("User not found");
+		}
+
+		return user;
+	}
 }
