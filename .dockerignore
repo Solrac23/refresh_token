@@ -1,0 +1,6 @@
+.vscode
+.zed
+
+node_modules
+Makefile.example
+.env.example
