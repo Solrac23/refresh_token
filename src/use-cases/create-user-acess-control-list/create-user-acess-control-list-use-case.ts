@@ -1,61 +1,53 @@
-import { prisma } from "@/database/lib/prisma";
-import type { UserRepository } from "@/repositories/user-repository";
+import type { IPermissionRepository } from "@/repositories/permission-repository";
+import type { IRoleRepository } from "@/repositories/role-repository";
+import type { IUserPermissionsRepository } from "@/repositories/user-permissions-repository";
+import type { IUserRepository } from "@/repositories/user-repository";
+import type { IUserRolesRepository } from "@/repositories/user-roles-repository";
 import type {
-  CreateUserAcessControlListDTO,
-  CreateUserAcessControlListResponseDTO,
+	CreateUserAcessControlListDTO,
+	CreateUserAcessControlListResponseDTO,
 } from "./create-user-acess-control-list-dto";
 
 export class CreateUserAcessControlListUseCase {
-  constructor(private repository: UserRepository) {}
-  public async execute({
-    userId,
-    roles,
-    permissions,
-  }: CreateUserAcessControlListDTO): Promise<CreateUserAcessControlListResponseDTO> {
-    const user = await this.repository.findUserById(userId);
+	constructor(
+		private repository: IUserRepository,
+		private permissionRepository: IPermissionRepository,
+		private roleRepository: IRoleRepository,
+		private userRolesRepository: IUserRolesRepository,
+		private userPermissionsRepository: IUserPermissionsRepository
+	) {}
 
-    if (!user) {
-      throw new Error("User not found");
-    }
+	public async execute({
+		userId,
+		roles,
+		permissions,
+	}: CreateUserAcessControlListDTO): Promise<CreateUserAcessControlListResponseDTO | null> {
+		const user = await this.repository.findUserById(userId);
 
-    const permissionsList = await prisma.permissions.findMany({
-      where: {
-        id: {
-          in: permissions,
-        },
-      },
-      select: {
-        id: true,
-      },
-    });
+		if (!user) {
+			throw new Error("User not found");
+		}
 
-    const rolesList = await prisma.roles.findMany({
-      where: {
-        id: {
-          in: roles,
-        },
-      },
-      select: {
-        id: true,
-      },
-    });
+		const permissionsList =
+			await this.permissionRepository.findByIds(permissions);
+		const rolesList = await this.roleRepository.findByIds(roles);
 
-    await prisma.usersRoles.createMany({
-      data: rolesList.map((role) => ({
-        userId,
-        roleId: role.id,
-      })),
-      skipDuplicates: true,
-    });
+		await this.userRolesRepository.assignRoles(
+			userId,
+			rolesList.map(r => r.id)
+		);
 
-    await prisma.usersPermissions.createMany({
-      data: permissionsList.map((permission) => ({
-        userId,
-        permissionId: permission.id,
-      })),
-      skipDuplicates: true,
-    });
+		await this.userPermissionsRepository.assignPermissions(
+			userId,
+			permissionsList.map(p => p.id)
+		);
 
-    return user;
-  }
+		const updatedUser = await this.repository.findUserById(userId);
+
+		if (!updatedUser) {
+			return null;
+		}
+
+		return updatedUser;
+	}
 }
