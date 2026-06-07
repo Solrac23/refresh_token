@@ -1,23 +1,18 @@
-import { prisma } from "@/database/lib/prisma";
+import type { IPermissionRepository } from "@/repositories/permission-repository";
 import type { CreatePermissionDTO } from "./create-permission-dto";
 
 export class CreatePermissionUseCase {
-  constructor() {}
+  constructor(private repository: IPermissionRepository) {}
 
   public async execute({
     name,
     description,
   }: CreatePermissionDTO): Promise<CreatePermissionDTO> {
-    const permissionAlreadyExists = await prisma.permissions.findFirst({
-      where: { name },
-    });
+    const permissionAlreadyExists = await this.repository.findByName(name);
 
     if (permissionAlreadyExists) throw new Error("Permission already exists");
 
-    const permission = await prisma.permissions.create({
-      data: { name, description },
-      select: { id: true, name: true, description: true },
-    });
+    const permission = await this.repository.create({ name, description });
 
     return permission;
   }
