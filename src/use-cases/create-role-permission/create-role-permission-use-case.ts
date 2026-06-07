@@ -1,48 +1,41 @@
-import { prisma } from "@/database/lib/prisma";
+import type { IPermissionRepository } from "@/repositories/permission-repository";
 import type {
-  CreateRolePermissionDTO,
-  CreateRolePermissionResponse,
-} from "./create-role-permission-dto";
+  IRoleRepository,
+  RoleWithPermissions,
+} from "@/repositories/role-repository";
+import type { CreateRolePermissionDTO } from "./create-role-permission-dto";
 
 export class CreateRolePermissionUseCase {
-  constructor() {}
+  constructor(
+    private roleRepository: IRoleRepository,
+    private permissionRepository: IPermissionRepository,
+  ) {}
+
   async execute({
     roleId,
     permissions,
-  }: CreateRolePermissionDTO): Promise<CreateRolePermissionResponse> {
-    const role = await prisma.roles.findFirst({
-      where: { id: roleId },
-      select: {
-        id: true,
-        name: true,
-        description: true,
-        createdAt: true,
-        updatedAt: true,
-        permissionsRoles: {
-          select: {
-            permission: true,
-          },
-        },
-      },
-    });
+  }: CreateRolePermissionDTO): Promise<RoleWithPermissions> {
+    const role = await this.roleRepository.findByIdWithPermissions(roleId);
 
     if (!role) {
       throw new Error("Role not found");
     }
 
-    const perssionsList = await prisma.permissions.findMany({
-      where: { id: { in: permissions } },
-      select: { id: true },
-    });
+    const permissionsList =
+      await this.permissionRepository.findByIds(permissions);
 
-    await prisma.permissionsRoles.createMany({
-      data: perssionsList.map((p) => ({
-        roleId: role.id,
-        permissionId: p.id,
-      })),
-      skipDuplicates: true,
-    });
+    await this.roleRepository.assignPermissions(
+      role.id,
+      permissionsList.map((p) => p.id),
+    );
 
-    return role;
+    const updatedRole =
+      await this.roleRepository.findByIdWithPermissions(roleId);
+
+    if (!updatedRole) {
+      throw new Error("Role not found");
+    }
+
+    return updatedRole;
   }
 }
