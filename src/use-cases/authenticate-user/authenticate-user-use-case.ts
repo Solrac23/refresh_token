@@ -1,6 +1,7 @@
-import { prisma } from "@/database/lib/prisma";
 import type { GenerateRefreshTokenProvider } from "@/provider/generate-refresh-token-provider";
 import type { JwtProvider } from "@/provider/jwt/jwt-provider";
+import type { IRefreshTokenRepository } from "@/repositories/refresh-token-repository/i-refresh-token-repository";
+import type { IUserRepository } from "@/repositories/user-repository/i-user-repository";
 import type { Encryption } from "../util/encryption";
 import type {
 	IAuthenticateUserRequestDTO,
@@ -11,7 +12,9 @@ export class AuthenticateUserUseCase {
 	constructor(
 		private encryption: Encryption,
 		private readonly jwtProvider: JwtProvider,
-		private readonly generateRefreshToken: GenerateRefreshTokenProvider
+		private readonly generateRefreshToken: GenerateRefreshTokenProvider,
+		private readonly userRepository: IUserRepository,
+		private readonly refreshTokenRepository: IRefreshTokenRepository
 	) {}
 
 	public async execute({
@@ -21,11 +24,10 @@ export class AuthenticateUserUseCase {
 	}: IAuthenticateUserRequestDTO): Promise<
 		IAuthenticateUserResponseDTO | unknown
 	> {
-		const user = await prisma.user.findFirstOrThrow({
-			where: {
-				OR: [{ username }, { email }],
-			},
-		});
+		const user = await this.userRepository.findByUsernameOrEmail(
+			username,
+			email
+		);
 
 		if (!user) {
 			throw new Error("User or password incorrect");
@@ -37,7 +39,7 @@ export class AuthenticateUserUseCase {
 		);
 
 		if (!isPasswordMatch) {
-			throw new Error("User or password incorrect");
+			throw new Error("User or password incorrect!");
 		}
 
 		const token = await this.jwtProvider.signToken({
@@ -46,11 +48,7 @@ export class AuthenticateUserUseCase {
 			email: user.email,
 		});
 
-		await prisma.refreshToken.deleteMany({
-			where: {
-				userId: user.id,
-			},
-		});
+		await this.refreshTokenRepository.deleteByUserId(user.id);
 
 		const refreshToken = await this.generateRefreshToken.execute(user.id);
 
