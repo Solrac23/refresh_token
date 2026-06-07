@@ -4,8 +4,8 @@ import { CreateUserController } from "./create-user-controller";
 import { CreateUserUseCase } from "./create-user-use-case";
 
 const createUserUseCase = new CreateUserUseCase(
-	new Encryption(),
-	new UserRepository()
+  new Encryption(),
+  new UserRepository(),
 );
 
 const createUserController = new CreateUserController(createUserUseCase);
