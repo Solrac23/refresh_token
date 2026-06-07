@@ -1,4 +1,4 @@
-import { prisma } from "@/database/lib/prisma";
+import { RefreshTokenRepository } from "@/repositories/refresh-token-repository";
 import dayjs from "dayjs";
 
 export class GenerateRefreshTokenProvider {
@@ -7,17 +7,11 @@ export class GenerateRefreshTokenProvider {
 
     const expiresIn = dayjs().add(15, "hours").unix();
 
-    const generateToken = await prisma.refreshToken.create({
-      data: {
-        userId,
-        expiresIn,
-      },
-      select: {
-        id: true,
-        expiresIn: true,
-        userId: true,
-      },
-    });
+    const refreshTokenRepository = new RefreshTokenRepository();
+    const generateToken = await refreshTokenRepository.create(
+      userId,
+      expiresIn,
+    );
 
     return generateToken;
   }
