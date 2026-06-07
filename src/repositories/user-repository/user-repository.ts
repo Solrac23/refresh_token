@@ -47,4 +47,50 @@ export class UserRepository implements IUserRepository {
       },
     });
   }
+
+  public async findByUsernameOrEmail(
+    username: string,
+    email: string,
+  ): Promise<User | null> {
+    return await prisma.user.findFirst({
+      where: {
+        OR: [{ username }, { email }],
+      },
+    });
+  }
+
+  public async create(
+    data: Pick<User, "name" | "username" | "email" | "password">,
+  ): Promise<Pick<User, "id" | "name" | "username" | "email">> {
+    return await prisma.user.create({
+      data,
+      select: {
+        id: true,
+        name: true,
+        username: true,
+        email: true,
+      },
+    });
+  }
+
+  public async findByIdWithoutRelations(
+    id: string,
+  ): Promise<Pick<
+    User,
+    "id" | "name" | "username" | "email" | "createdAt" | "updatedAt"
+  > | null> {
+    return await prisma.user.findFirst({
+      where: {
+        id,
+      },
+      select: {
+        id: true,
+        name: true,
+        username: true,
+        email: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+  }
 }
