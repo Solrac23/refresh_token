@@ -1,6 +1,7 @@
 import fastifyCors from "@fastify/cors";
 import helmet from "@fastify/helmet";
 import fastifySwagger from "@fastify/swagger";
+import fastifyRateLimit from "@fastify/rate-limit";
 import scalarApiReference from "@scalar/fastify-api-reference";
 import "dotenv/config";
 import fastify from "fastify";
@@ -24,7 +25,34 @@ const app = fastify({
 app.setValidatorCompiler(validatorCompiler);
 app.setSerializerCompiler(serializerCompiler);
 
-if (process.env.NODE_ENV === "production") app.register(helmet);
+if (process.env.NODE_ENV === "production") {
+  app.register(helmet);
+  app.register(fastifyRateLimit, {
+    global: true,
+    max: 100,
+    timeWindow: "5 minute",
+    addHeadersOnExceeding: {
+      "x-ratelimit-limit": true,
+      "x-ratelimit-remaining": true,
+      "x-ratelimit-reset": true,
+    },
+    addHeaders: {
+      "x-ratelimit-limit": true,
+      "x-ratelimit-remaining": true,
+      "x-ratelimit-reset": true,
+      "retry-after": true,
+    },
+    errorResponseBuilder: (request, context) => {
+      return {
+        statusCode: context.statusCode,
+        error: "Too many requests",
+        message: `I only allow ${context.max} requests per ${context.after} to this Website. Try again soon.`,
+        date: Date.now(),
+        expiresIn: context.ttl,
+      };
+    },
+  });
+}
 
 app.register(fastifyCors, {
   origin: true,
