@@ -11,7 +11,7 @@ import {
   type ZodTypeProvider,
 } from "fastify-type-provider-zod";
 import { envToLogger } from "./logger/env-to-logger";
-import type { LoggerEnvType } from "./logger/logger-env-dto";
+import type { LoggerEnvType } from "./logger/logger-env-type";
 import { jwtPlugin } from "./plugins/jwt.plugins";
 import { routes } from "./routes/index";
 
@@ -83,7 +83,7 @@ async function bootstrap() {
     },
     (err, address) => {
       if (err) {
-        console.error(err);
+        app.log.error(err);
         process.exit(1);
       }
       app.log.info(`Server is running on ${address}`);

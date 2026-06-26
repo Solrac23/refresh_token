@@ -6,11 +6,11 @@
   "_version": "24.0.0",
   "compilerOptions": {
     "lib": [
-      "ESNext",
+      "ES2025",
       "ESNext.Array",
       "ESNext.Collection",
       "ESNext.Iterator",
-      "ESNext.Promise"
+      "ESNext.Promise",
     ],
     "module": "esnext",
     "target": "es2025",
@@ -18,14 +18,17 @@
     "paths": {
       "@/*": ["./src/*"],
       "@useCases/*": ["./src/use-cases/*"],
+      "@middlewares/*": ["./src/middlewares/*"],
       "@database/*": ["./src/database/*"],
       "@provider/*": ["./src/provider/*"],
       "@schemas/*": ["./src/schemas/*"],
-      "@repositories/*": ["./src/repositories/*"]
+      "@repositories/*": ["./src/repositories/*"],
     },
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "moduleResolution": "bundler"
+    "moduleResolution": "bundler",
+    "rootDir": ".",
+    "outDir": "./dist",
   },
-  "exclude": ["node_modules", "dist"]
+  "exclude": ["node_modules"],
 }

@@ -6,8 +6,8 @@ import { authenticateUser } from "@useCases/authenticate-user";
 import { refreshTokenController } from "@useCases/refresh-token-user";
 
 export async function authRoutes(app: FastifyTypedInstance) {
-	const authController = authenticateUser(app);
-	const refreshTokenUserController = refreshTokenController(app);
+  const authController = authenticateUser(app);
+  const refreshTokenUserController = refreshTokenController(app);
 
   app.post(
     "/login",

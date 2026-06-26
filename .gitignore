@@ -2,10 +2,13 @@
 node_modules
 /src/database/generated/prisma
 prisma/migrations
+errors/
+dist/
+logs/
 
 # Keep environment variables out of version control
 .env.development
-.env.production
+.env
 .env.test
 
 # Keep vscode settings out of version control
