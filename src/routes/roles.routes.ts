@@ -12,7 +12,7 @@ import { createRolePermissionController } from "@/use-cases/create-role-permissi
 
 export async function rolesRoutes(app: FastifyTypedInstance) {
   app.post(
-    "/",
+    "",
     {
       onRequest: authenticate,
       schema: {
