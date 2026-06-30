@@ -7,15 +7,15 @@ import { RefreshTokenUserController } from "./refresh-token-user-controller";
 import { RefreshTokenUserUseCase } from "./refresh-token-user-use-case";
 
 export function refreshTokenController(app: FastifyInstance) {
-	const refreshTokenUserUseCase = new RefreshTokenUserUseCase(
-		new JwtProvider(app),
-		new GenerateRefreshTokenProvider(),
-		new UserRepository(),
-		new RefreshTokenRepository()
-	);
-	const refreshTokenUserController = new RefreshTokenUserController(
-		refreshTokenUserUseCase
-	);
+  const refreshTokenUserUseCase = new RefreshTokenUserUseCase(
+    new JwtProvider(app),
+    new GenerateRefreshTokenProvider(new RefreshTokenRepository()),
+    new UserRepository(),
+    new RefreshTokenRepository(),
+  );
+  const refreshTokenUserController = new RefreshTokenUserController(
+    refreshTokenUserUseCase,
+  );
 
-	return refreshTokenUserController;
+  return refreshTokenUserController;
 }
