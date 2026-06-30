@@ -5,6 +5,7 @@ prisma/migrations
 errors/
 dist/
 logs/
+.pnpm*/
 
 # Keep environment variables out of version control
 .env.development
@@ -16,7 +17,7 @@ logs/
 .zed
 
 # Keep pnpm lock file out of version control
-pnpm-lock.yaml
+pnpm*.yaml
 
 # Keep makefile out of version control
 Makefile
