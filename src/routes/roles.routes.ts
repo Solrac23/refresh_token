@@ -1,5 +1,7 @@
 import type { FastifyTypedInstance } from "@/fastify-typed-instance";
 import { authenticate } from "@/middlewares/authenticate";
+import { checkPermissions } from "@/middlewares/check-permissions";
+import { checkRoles } from "@/middlewares/check-roles";
 import { errorResponseSchema } from "@/schemas/error.schema";
 import {
   createRolePermissionRequestSchema,
@@ -33,6 +35,11 @@ export async function rolesRoutes(app: FastifyTypedInstance) {
   app.post(
     "/:roleId/permissions",
     {
+      onRequest: [
+        authenticate,
+        checkRoles(["admin", "super_admin"]),
+        checkPermissions(["create_role"]),
+      ],
       schema: {
         tags: ["roles"],
         description: "Create role permissions",
