@@ -1,6 +1,10 @@
 .vscode
 .zed
 
+.git
+.gitignore
 node_modules
 Makefile.example
 .env.example
+
+logs
