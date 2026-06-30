@@ -8,17 +8,17 @@ import { AuthenticateUserController } from "./authenticate-user-controller";
 import { AuthenticateUserUseCase } from "./authenticate-user-use-case";
 
 export function authenticateUser(app: FastifyInstance) {
-	const authenticateUserUseCase = new AuthenticateUserUseCase(
-		new Encryption(),
-		new JwtProvider(app),
-		new GenerateRefreshTokenProvider(),
-		new UserRepository(),
-		new RefreshTokenRepository()
-	);
+  const authenticateUserUseCase = new AuthenticateUserUseCase(
+    new Encryption(),
+    new JwtProvider(app),
+    new GenerateRefreshTokenProvider(new RefreshTokenRepository()),
+    new UserRepository(),
+    new RefreshTokenRepository(),
+  );
 
-	const authenticateUserController = new AuthenticateUserController(
-		authenticateUserUseCase
-	);
+  const authenticateUserController = new AuthenticateUserController(
+    authenticateUserUseCase,
+  );
 
-	return authenticateUserController;
+  return authenticateUserController;
 }
