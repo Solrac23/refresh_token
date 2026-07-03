@@ -3,20 +3,12 @@ import { prisma } from "@/database/lib/prisma";
 import type { IRefreshTokenRepository } from "./i-refresh-token-repository";
 
 export class RefreshTokenRepository implements IRefreshTokenRepository {
-  public async findRefreshTokenById(id: string): Promise<RefreshToken | null> {
+  public async findRefreshTokenByHash(
+    tokenHash: string,
+  ): Promise<RefreshToken | null> {
     return await prisma.refreshToken.findFirst({
       where: {
-        id,
-      },
-    });
-  }
-
-  public async deleteRefreshTokenById(
-    id: string,
-  ): Promise<RefreshToken | null> {
-    return await prisma.refreshToken.delete({
-      where: {
-        id,
+        tokenHash,
       },
     });
   }
@@ -31,17 +23,14 @@ export class RefreshTokenRepository implements IRefreshTokenRepository {
 
   public async create(
     userId: string,
+    tokenHash: string,
     expiresIn: number,
-  ): Promise<Pick<RefreshToken, "id" | "expiresIn" | "userId">> {
-    return await prisma.refreshToken.create({
+  ): Promise<void> {
+    await prisma.refreshToken.create({
       data: {
+        tokenHash,
         userId,
         expiresIn,
-      },
-      select: {
-        id: true,
-        expiresIn: true,
-        userId: true,
       },
     });
   }
