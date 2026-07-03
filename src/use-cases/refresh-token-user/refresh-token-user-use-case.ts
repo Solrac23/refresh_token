@@ -3,49 +3,43 @@ import type { JwtProvider } from "@/provider/jwt/jwt-provider";
 import type { IRefreshTokenRepository } from "@/repositories/refresh-token-repository/i-refresh-token-repository";
 import type { IUserRepository } from "@/repositories/user-repository/i-user-repository";
 import dayjs from "dayjs";
+import { createHash } from "node:crypto";
 
 export class RefreshTokenUserUseCase {
-	constructor(
-		private readonly jwtProvider: JwtProvider,
-		private readonly generateRefreshToken: GenerateRefreshTokenProvider,
-		private readonly userRepository: IUserRepository,
-		private readonly refreshTokenRepository: IRefreshTokenRepository
-	) {}
+  constructor(
+    private readonly jwtProvider: JwtProvider,
+    private readonly generateRefreshToken: GenerateRefreshTokenProvider,
+    private readonly userRepository: IUserRepository,
+    private readonly refreshTokenRepository: IRefreshTokenRepository,
+  ) {}
 
-	public async execute(refresh_token: string) {
-		const refreshTokenExist =
-			await this.refreshTokenRepository.findRefreshTokenById(refresh_token);
+  public async execute(rawToken: string) {
+    const tokenHash = createHash("sha256").update(rawToken).digest("hex");
 
-		if (!refreshTokenExist) throw new Error("Refresh token not found");
+    const storedToken =
+      await this.refreshTokenRepository.findRefreshTokenByHash(tokenHash);
 
-		const user = await this.userRepository.findUserById(
-			refreshTokenExist.userId
-		);
+    if (!storedToken) throw new Error("Refresh token not found");
 
-		if (!user) throw new Error("Refresh token not found");
+    const isExpired = dayjs().isAfter(dayjs.unix(storedToken?.expiresIn));
 
-		const token = await this.jwtProvider.signToken({
-			id: refreshTokenExist.userId,
-			username: user.username,
-			email: user.email,
-		});
+    if (isExpired) {
+      await this.refreshTokenRepository.deleteByUserId(storedToken.userId);
 
-		const refreshTokenExpired = dayjs().isAfter(
-			dayjs.unix(refreshTokenExist?.expiresIn)
-		);
+      throw new Error("Refresh token expired. Please log in again.");
+    }
 
-		if (refreshTokenExpired) {
-			await this.refreshTokenRepository.deleteByUserId(
-				refreshTokenExist.userId
-			);
+    const user = await this.userRepository.findUserById(storedToken.userId);
+    if (!user) throw new Error("Refresh token not found");
 
-			const newRefreshToken = await this.generateRefreshToken.execute(
-				refreshTokenExist.userId
-			);
+    const acessToken = await this.jwtProvider.signToken({
+      id: storedToken.userId,
+      username: user.username,
+      email: user.email,
+    });
 
-			return { token, refreshToken: newRefreshToken };
-		}
+    const newRefreshToken = await this.generateRefreshToken.execute(user.id);
 
-		return { token };
-	}
+    return { acessToken, refreshToken: newRefreshToken };
+  }
 }
