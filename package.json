@@ -8,6 +8,7 @@
     "studio:dev": "dotenv -e .env.development -- prisma studio",
     "generate:dev": "dotenv -e .env.development -- prisma generate",
     "migrate:dev": "dotenv -e .env.development -- prisma migrate dev --name",
+    "migrate:create": "dotenv -e .env.development -- prisma migrate dev --create-only",
     "dev": "tsx watch --env-file=.env.development src/app.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
     "db:deploy": "prisma migrate deploy && prisma generate",
