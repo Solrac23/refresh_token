@@ -21,9 +21,7 @@ export class AuthenticateUserUseCase {
     username,
     email,
     password,
-  }: IAuthenticateUserRequestDTO): Promise<
-    IAuthenticateUserResponseDTO | unknown
-  > {
+  }: IAuthenticateUserRequestDTO): Promise<IAuthenticateUserResponseDTO> {
     const user = await this.userRepository.findByUsernameOrEmail(
       username,
       email,
@@ -42,16 +40,14 @@ export class AuthenticateUserUseCase {
       throw new Error("User or password incorrect!");
     }
 
-    const token = await this.jwtProvider.signToken({
+    const acessToken = await this.jwtProvider.signToken({
       id: user.id,
       username: user.username,
       email: user.email,
     });
 
-    await this.refreshTokenRepository.deleteByUserId(user.id);
-
     const refreshToken = await this.generateRefreshToken.execute(user.id);
 
-    return { token, refreshToken };
+    return { acessToken, refreshToken };
   }
 }
