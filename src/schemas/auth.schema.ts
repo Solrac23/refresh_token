@@ -7,12 +7,6 @@ export const authRequestSchema = z.object({
 });
 
 export const authResponseSchema = z.object({
-	token: z.jwt({ alg: "HS384" }),
-	refreshToken: z.optional(
-		z.object({
-			id: z.string(),
-			expiresIn: z.number(),
-			userId: z.string(),
-		})
-	),
+  acessToken: z.jwt({ alg: "HS384" }),
+  refreshToken: z.hex(),
 });
