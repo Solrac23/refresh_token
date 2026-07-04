@@ -203,6 +203,11 @@ DATABASE_PASSWORD=postgres
 DATABASE_NAME=refresh_token_db
 
 JWT_SECRET=sua_chave_secreta_aqui
+JWT_EXPIRES=tempo_expiracao_da_chave
+
+SALT_PASSWORD=8
+KEY_LENGTH=16
+
 ```
 
 ### 3. Suba o banco de dados
